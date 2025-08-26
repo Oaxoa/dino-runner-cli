@@ -6,6 +6,8 @@
 	"description": "A fast-paced terminal-based endless runner game inspired by the Chrome dinosaur game! Built with TypeScript and Node.js.\nNavigate through obstacles, collect points, and see how long you can survive as the difficulty increases!",
 	"type": "module",
 	"license": "MIT",
+	"repository": "https://github.com/Oaxoa/dino-runner-cli",
+	"homepage": "https://github.com/Oaxoa/dino-runner-cli",
 	"bin": {
 		"dino-runner-cli": "index.js"
 	},
