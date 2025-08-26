@@ -13,7 +13,7 @@ ___▐___________________________g____________y________________⍘__ | Score: 15
 
 ## 🚀 Quick Start
 
-Github: https://github.com/Oaxoa/dino-runner-cli
+Github: https://github.com/Oaxoa/dino-runner-cli<br>
 NPM: https://www.npmjs.com/package/dino-runner-cli
 
 ### Play Instantly (Recommended)
