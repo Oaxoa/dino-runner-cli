@@ -1,16 +1,16 @@
 {
 	"name": "dino-runner-cli",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"author": "Pierluigi Pesenti (gpantaa@gmail.com)",
 	"main": "index.js",
-	"description": "A simple CLI runner game",
+	"description": "A fast-paced terminal-based endless runner game inspired by the Chrome dinosaur game! Built with TypeScript and Node.js.\nNavigate through obstacles, collect points, and see how long you can survive as the difficulty increases!",
 	"type": "module",
 	"license": "MIT",
 	"bin": {
-		"dino-runner-cli": "./index.js"
+		"dino-runner-cli": "index.js"
 	},
 	"scripts": {
-		"build": "bun build index.ts --outdir . --target node",
+		"build": "bun build index.ts --outdir . --target node && echo '#!/usr/bin/env node' > temp.js && cat index.js >> temp.js && mv temp.js index.js && chmod +x index.js",
 		"prepublishOnly": "npm run build"
 	},
 	"keywords": [
