@@ -102,12 +102,6 @@ This package is designed to be distributed via npm and run with `npx`. The build
 
 Feel free to submit issues and pull requests! Some ideas for contributions:
 
-- Add power-ups or special items
-- Implement different character skins
-- Add sound effects (terminal beeps)
-- Create different game modes
-- Add high score persistence
-
 ## 📄 License
 
 MIT License - see package.json for details
