@@ -6,9 +6,9 @@ Navigate through obstacles, collect points, and see how long you can survive as 
 ## 🎮 Game Preview
 
 ```
-___▐___________________________________________________________⍘ | Score: 15 | Lvl: 2
-___▌__________________________________________________________⍘_ | Score: 15 | Lvl: 2
-___▐_________________________________________________________⍘__ | Score: 15 | Lvl: 2
+___▐_____________________________g____________y________________⍘ | Score: 15 | Lvl: 2
+___▌____________________________g____________y________________⍘_ | Score: 15 | Lvl: 2
+___▐___________________________g____________y________________⍘__ | Score: 15 | Lvl: 2
 ```
 
 ## 🚀 Quick Start
@@ -115,7 +115,3 @@ MIT License - see package.json for details
 ## 👨‍💻 Author
 
 Pierluigi Pesenti (gpantaa@gmail.com)
-
----
-
-*Built with ❤️ and lots of ☕ using [Bun](https://bun.sh)*
