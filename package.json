@@ -1,0 +1,31 @@
+{
+	"name": "dino-runner-cli",
+	"version": "0.1.0",
+	"author": "Pierluigi Pesenti (gpantaa@gmail.com)",
+	"main": "index.js",
+	"description": "A simple CLI runner game",
+	"type": "module",
+	"license": "MIT",
+	"bin": {
+		"dino-runner-cli": "./index.js"
+	},
+	"scripts": {
+		"build": "bun build index.ts --outdir . --target node",
+		"prepublishOnly": "npm run build"
+	},
+	"keywords": [
+		"cli",
+		"game",
+		"runner",
+		"dino runner",
+		"terminal",
+		"chrome dinosaur",
+		"trex game"
+	],
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
+}
