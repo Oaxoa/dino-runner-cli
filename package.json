@@ -1,6 +1,6 @@
 {
 	"name": "dino-runner-cli",
-	"version": "0.1.2",
+	"version": "0.2.0",
 	"author": "Pierluigi Pesenti (gpantaa@gmail.com)",
 	"main": "index.js",
 	"description": "A fast-paced terminal-based endless runner game inspired by the Chrome dinosaur game! Built with TypeScript and Node.js.\nNavigate through obstacles, collect points, and see how long you can survive as the difficulty increases!",
