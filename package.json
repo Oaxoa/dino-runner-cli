@@ -12,6 +12,7 @@
 		"dino-runner-cli": "index.js"
 	},
 	"scripts": {
+		"dev": "npm run build && node index.js",
 		"build": "bun build index.ts --outdir . --target node && echo '#!/usr/bin/env node' > temp.js && cat index.js >> temp.js && mv temp.js index.js && chmod +x index.js",
 		"prepublishOnly": "npm run build"
 	},
