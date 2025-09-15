@@ -60,12 +60,17 @@ const defaultState: TState = {
 
 // PLATFORM SPECIFIC CODE
 
+const OFFSET_UI = 24;
+
 const clear = () => {
 	process.stdout.write('\r\x1b[K');
 }
 const log = (state: TState, arg: string) => {
+	const width = (process.stdout.columns || 80) - OFFSET_UI;
+	const output = arg.length > width ? arg.slice(0, width) : arg;
+
 	clear();
-	process.stdout.write(`\r${arg} | Score: ${state.score} | Lvl: ${Math.floor(state.difficulty)}`);
+	process.stdout.write(`\r${output} | Score: ${state.score} | Lvl: ${Math.floor(state.difficulty)}`);
 }
 
 const onStartKey = (key) => {
@@ -77,7 +82,8 @@ const onStartKey = (key) => {
 const getPad = (len: number) => new Array(len).fill('_').join('');
 
 const padWithGround = (arg: string) => {
-	const diffLength = CHUNK_SIZE - arg.length;
+	const width = Math.min(process.stdout.columns - OFFSET_UI, CHUNK_SIZE);
+	const diffLength = width - arg.length;
 	const lengthBefore = Math.floor(diffLength / 2);
 	const lengthAfter = Math.ceil(diffLength / 2);
 	const padBefore = getPad(lengthBefore - 1);
@@ -86,12 +92,14 @@ const padWithGround = (arg: string) => {
 	return `${padBefore} ${arg} ${padAfter}`;
 };
 
-const init = (state: TState) => {
+const preInit = () => {
 	process.stdin.setRawMode(true);
 	process.stdin.resume();
 	process.stdin.setEncoding("utf8");
+}
 
-	log(state || {...defaultState}, padWithGround('Press SPACE to start'));
+const init = (state?: TState) => {
+	log(state || {...defaultState}, padWithGround('SPACE to start. ↑ = Jump, ↓ = Crouch'));
 
 	process.stdin.on("data", onStartKey);
 };
@@ -160,9 +168,7 @@ const render = (state: TState) => {
 	log(state, withPlayer.reduce(toRendered(state), ""));
 }
 
-
 /////////////////////////////
-
 
 const startGame = () => {
 	let state = {...defaultState};
@@ -195,5 +201,6 @@ const startGame = () => {
 	});
 }
 
-init();
-// startGame();
+preInit();
+// to get process.stdout.columns populated can take quite some time
+setTimeout(init, 500);

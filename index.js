@@ -32,12 +32,15 @@ var defaultState = {
   chunk2: getChunk(1),
   chunks: null
 };
+var OFFSET_UI = 24;
 var clear = () => {
   process.stdout.write("\r\x1B[K");
 };
 var log = (state, arg) => {
+  const width = (process.stdout.columns || 80) - OFFSET_UI;
+  const output = arg.length > width ? arg.slice(0, width) : arg;
   clear();
-  process.stdout.write(`\r${arg} | Score: ${state.score} | Lvl: ${Math.floor(state.difficulty)}`);
+  process.stdout.write(`\r${output} | Score: ${state.score} | Lvl: ${Math.floor(state.difficulty)}`);
 };
 var onStartKey = (key) => {
   if (key === " ") {
@@ -46,18 +49,21 @@ var onStartKey = (key) => {
 };
 var getPad = (len) => new Array(len).fill("_").join("");
 var padWithGround = (arg) => {
-  const diffLength = CHUNK_SIZE - arg.length;
+  const width = Math.min(process.stdout.columns - OFFSET_UI, CHUNK_SIZE);
+  const diffLength = width - arg.length;
   const lengthBefore = Math.floor(diffLength / 2);
   const lengthAfter = Math.ceil(diffLength / 2);
   const padBefore = getPad(lengthBefore - 1);
   const padAfter = getPad(lengthAfter - 1);
   return `${padBefore} ${arg} ${padAfter}`;
 };
-var init = (state) => {
+var preInit = () => {
   process.stdin.setRawMode(true);
   process.stdin.resume();
   process.stdin.setEncoding("utf8");
-  log(state || { ...defaultState }, padWithGround("Press SPACE to start"));
+};
+var init = (state) => {
+  log(state || { ...defaultState }, padWithGround("SPACE to start. ↑ = Jump, ↓ = Crouch"));
   process.stdin.on("data", onStartKey);
 };
 var endGame = (state) => {
@@ -124,4 +130,5 @@ var startGame = () => {
     }
   });
 };
-init();
+preInit();
+setTimeout(init, 500);
