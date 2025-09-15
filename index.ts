@@ -13,8 +13,15 @@ type TState = {
 
 // SETUP
 
+let intervalMain: NodeJS.Timeout;
+
+
 const keys = {
+	// space
+	" ": 6,
+	// up arrow
 	"\u001b[A": 6,
+	// down arrow
 	"\u001b[B": 7,
 };
 
@@ -23,24 +30,6 @@ const blocks = ['_', 'g', 'y', '⍘', '▌', '▐', '▀', '▄',];
 const CHUNK_SIZE = 64;
 const PLAYER_X = 3;
 const EMPTY_CHUNK = new Array(CHUNK_SIZE).fill(0);
-
-// PLATFORM SPECIFIC CODE
-
-const init = () => {
-	process.stdin.setRawMode(true);
-	process.stdin.resume();
-	process.stdin.setEncoding("utf8");
-};
-
-const log = (state: TState, arg: string) => {
-	process.stdout.write(`\r${arg} | Score: ${state.score} | Lvl: ${Math.floor(state.difficulty)}`);
-}
-
-const quit = () => {
-	process.exit();
-}
-
-// UTILS
 
 const toRandomBlock = () => ({
 	position: Math.floor(Math.random() * CHUNK_SIZE),
@@ -57,6 +46,71 @@ const getChunk = (difficulty: number) => {
 		return acc;
 	}, [...EMPTY_CHUNK]);
 }
+
+const defaultState: TState = {
+	score: 0,
+	playerState: 4,
+	playerFlipState: false,
+	difficulty: 1,
+	scroll: 0,
+	chunk1: getChunk(0),
+	chunk2: getChunk(1),
+	chunks: null,
+};
+
+// PLATFORM SPECIFIC CODE
+
+const clear = () => {
+	process.stdout.write('\r\x1b[K');
+}
+const log = (state: TState, arg: string) => {
+	clear();
+	process.stdout.write(`\r${arg} | Score: ${state.score} | Lvl: ${Math.floor(state.difficulty)}`);
+}
+
+const onStartKey = (key) => {
+	if (key === " ") {
+		startGame();
+	}
+};
+
+const getPad = (len: number) => new Array(len).fill('_').join('');
+
+const padWithGround = (arg: string) => {
+	const diffLength = CHUNK_SIZE - arg.length;
+	const lengthBefore = Math.floor(diffLength / 2);
+	const lengthAfter = Math.ceil(diffLength / 2);
+	const padBefore = getPad(lengthBefore - 1);
+	const padAfter = getPad(lengthAfter - 1);
+
+	return `${padBefore} ${arg} ${padAfter}`;
+};
+
+const init = (state: TState) => {
+	process.stdin.setRawMode(true);
+	process.stdin.resume();
+	process.stdin.setEncoding("utf8");
+
+	log(state || {...defaultState}, padWithGround('Press SPACE to start'));
+
+	process.stdin.on("data", onStartKey);
+};
+
+const endGame = (state: TState) => {
+	clearInterval(intervalMain);
+
+	setTimeout(() => log(state, padWithGround('GAME OVER!')), 0);
+
+	setTimeout(() => init(state), 2000);
+
+}
+
+const quit = () => {
+	process.exit();
+}
+
+// UTILS
+
 
 const checkCollision = (state: TState, chunks: number[]) => {
 	const targetBlock = chunks[PLAYER_X];
@@ -86,8 +140,7 @@ const step = (state: TState) => {
 	}
 
 	if (checkCollision(newState, chunks)) {
-		log(newState, `GAME OVER!`);
-		quit();
+		endGame(state);
 	}
 
 	newState.playerFlipState = !newState.playerFlipState;
@@ -110,22 +163,15 @@ const render = (state: TState) => {
 
 /////////////////////////////
 
-const initState: TState = {
-	score: 0,
-	playerState: 4,
-	playerFlipState: false,
-	difficulty: 1,
-	scroll: 0,
-	chunk1: getChunk(0),
-	chunk2: getChunk(1),
-	chunks: null,
-};
 
 const startGame = () => {
-	let state = initState;
+	let state = {...defaultState};
+	let timeout: NodeJS.Timeout;
+
+	process.stdin.off("data", onStartKey);
 
 	// animate
-	setInterval(() => {
+	intervalMain = setInterval(() => {
 		state = step(state);
 		render(state);
 	}, 50);
@@ -139,8 +185,9 @@ const startGame = () => {
 		if (match) {
 			// set the player to up or down
 			state.playerState = match;
+			clearTimeout(timeout);
 
-			setTimeout(() => {
+			timeout = setTimeout(() => {
 				// reset the player
 				state.playerState = 4;
 			}, 500)
@@ -149,4 +196,4 @@ const startGame = () => {
 }
 
 init();
-startGame();
+// startGame();
