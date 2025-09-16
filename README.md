@@ -1,4 +1,4 @@
-# 🦖Dino Runner CLI
+# 🦖 Dino Runner CLI
 
 A fast-paced terminal-based endless runner game inspired by the Chrome dinosaur game! Built with TypeScript and Node.js.
 Navigate through obstacles, collect points, and see how long you can survive as the difficulty increases!
