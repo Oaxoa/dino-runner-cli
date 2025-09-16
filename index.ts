@@ -15,7 +15,9 @@ type TState = {
 
 let intervalMain: NodeJS.Timeout;
 
-
+/**
+ * All the keys used in the game
+ */
 const keys = {
 	// space
 	" ": 6,
@@ -25,17 +27,30 @@ const keys = {
 	"\u001b[B": 7,
 };
 
+/**
+ * All the blocks used in the game
+ */
 const blocks = ['_', 'g', 'y', '⍘', '▌', '▐', '▀', '▄',];
 
 const CHUNK_SIZE = 64;
 const PLAYER_X = 3;
 const EMPTY_CHUNK = new Array(CHUNK_SIZE).fill(0);
+/**
+ * The offset that is reserved for showing UI (score/difficulty) at the end of the line
+ */
+const OFFSET_UI = 24;
 
+/**
+ * Maps an obstacle to a random block
+ */
 const toRandomBlock = () => ({
 	position: Math.floor(Math.random() * CHUNK_SIZE),
 	block: Math.floor(Math.random() * 3) + 1
 });
 
+/**
+ * Returns a random chunk based on the difficulty
+ */
 const getChunk = (difficulty: number) => {
 	const numberOfObstacles = Math.round(difficulty);
 
@@ -60,11 +75,16 @@ const defaultState: TState = {
 
 // PLATFORM SPECIFIC CODE
 
-const OFFSET_UI = 24;
-
+/**
+ * Clear the console
+ */
 const clear = () => {
 	process.stdout.write('\r\x1b[K');
 }
+
+/**
+ * Logs a string and the current state (score/difficulty)
+ */
 const log = (state: TState, arg: string) => {
 	const width = (process.stdout.columns || 80) - OFFSET_UI;
 	const output = arg.length > width ? arg.slice(0, width) : arg;
@@ -73,14 +93,23 @@ const log = (state: TState, arg: string) => {
 	process.stdout.write(`\r${output} | Score: ${state.score} | Lvl: ${Math.floor(state.difficulty)}`);
 }
 
+/**
+ * Listener for game start
+ */
 const onStartKey = (key) => {
 	if (key === " ") {
 		startGame();
 	}
 };
 
+/**
+ * Gets a "pad" string
+ */
 const getPad = (len: number) => new Array(Math.max(len, 0)).fill('_').join('');
 
+/**
+ * Pads a string with the ground ("_") character
+ */
 const padWithGround = (arg: string) => {
 	const width = Math.min(process.stdout.columns - OFFSET_UI, CHUNK_SIZE);
 	const diffLength = width - arg.length;
@@ -92,34 +121,38 @@ const padWithGround = (arg: string) => {
 	return `${padBefore} ${arg} ${padAfter}`;
 };
 
-const preInit = () => {
+/**
+ * Inits boring stuff
+ */
+const init = () => {
 	process.stdin.setRawMode(true);
 	process.stdin.resume();
 	process.stdin.setEncoding("utf8");
 }
 
-const init = (state?: TState) => {
+/**
+ * Resets the start screen
+ */
+const initStartScreen = (state?: TState) => {
 	log(state || {...defaultState}, padWithGround('SPACE to start. ↑ = Jump, ↓ = Crouch'));
 
 	process.stdin.on("data", onStartKey);
 };
 
+/**
+ * Ends the game and resets the start screen
+ */
 const endGame = (state: TState) => {
 	clearInterval(intervalMain);
 
 	setTimeout(() => log(state, padWithGround('GAME OVER!')), 0);
-
-	setTimeout(() => init(state), 2000);
-
+	setTimeout(() => initStartScreen(state), 2000);
 }
 
-const quit = () => {
-	process.exit();
-}
 
-// UTILS
-
-
+/**
+ * Checks collisions with obstacles
+ */
 const checkCollision = (state: TState, chunks: number[]) => {
 	const targetBlock = chunks[PLAYER_X];
 
@@ -133,6 +166,9 @@ const checkCollision = (state: TState, chunks: number[]) => {
 	return hitDown || hitUp;
 }
 
+/**
+ * Steps the state, so that the screen moves etc.
+ */
 const step = (state: TState) => {
 	const newState = {...state};
 	const chunks = [...newState.chunk1, ...newState.chunk2].slice(newState.scroll, newState.scroll + CHUNK_SIZE);
@@ -141,6 +177,8 @@ const step = (state: TState) => {
 	newState.scroll += 1;
 	newState.scroll = newState.scroll % CHUNK_SIZE;
 
+	// When the scroll state loops around the chunk size,
+	// we generate a new random chunk based on the difficulty
 	if (newState.scroll === 0) {
 		newState.chunk1 = newState.chunk2;
 		newState.chunk2 = getChunk(newState.difficulty);
@@ -156,11 +194,17 @@ const step = (state: TState) => {
 	return newState;
 }
 
+/**
+ * Reduces the state down to a string that can be rendered
+ */
 const toRendered = (state: TState) => (acc: string, code: number) => {
 	acc += code === 4 ? blocks[code + (state.playerFlipState ? 1 : 0)] : blocks[code];
 	return acc;
 }
 
+/**
+ * Renders the state and the player to the terminal
+ */
 const render = (state: TState) => {
 	const withPlayer = [...state.chunks];
 	withPlayer[PLAYER_X] = state.playerState;
@@ -168,8 +212,9 @@ const render = (state: TState) => {
 	log(state, withPlayer.reduce(toRendered(state), ""));
 }
 
-/////////////////////////////
-
+/**
+ * Starts a new game
+ */
 const startGame = () => {
 	let state = {...defaultState};
 	let timeout: NodeJS.Timeout;
@@ -184,7 +229,7 @@ const startGame = () => {
 
 	// listen to kb events
 	process.stdin.on("data", (key) => {
-		if (key === "\u0003") quit(); // CTRL+C
+		if (key === "\u0003") process.exit(); // CTRL+C
 
 		const match = keys[key];
 
@@ -201,6 +246,9 @@ const startGame = () => {
 	});
 }
 
-preInit();
-// to get process.stdout.columns populated can take quite some time
-setTimeout(init, 500);
+init();
+
+
+// To get process.stdout.columns populated with the real value
+// can take quite some time. So we wait.
+setTimeout(initStartScreen, 1000);

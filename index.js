@@ -10,6 +10,7 @@ var blocks = ["_", "g", "y", "⍘", "▌", "▐", "▀", "▄"];
 var CHUNK_SIZE = 64;
 var PLAYER_X = 3;
 var EMPTY_CHUNK = new Array(CHUNK_SIZE).fill(0);
+var OFFSET_UI = 24;
 var toRandomBlock = () => ({
   position: Math.floor(Math.random() * CHUNK_SIZE),
   block: Math.floor(Math.random() * 3) + 1
@@ -32,7 +33,6 @@ var defaultState = {
   chunk2: getChunk(1),
   chunks: null
 };
-var OFFSET_UI = 24;
 var clear = () => {
   process.stdout.write("\r\x1B[K");
 };
@@ -57,22 +57,19 @@ var padWithGround = (arg) => {
   const padAfter = getPad(lengthAfter - 1);
   return `${padBefore} ${arg} ${padAfter}`;
 };
-var preInit = () => {
+var init = () => {
   process.stdin.setRawMode(true);
   process.stdin.resume();
   process.stdin.setEncoding("utf8");
 };
-var init = (state) => {
+var initStartScreen = (state) => {
   log(state || { ...defaultState }, padWithGround("SPACE to start. ↑ = Jump, ↓ = Crouch"));
   process.stdin.on("data", onStartKey);
 };
 var endGame = (state) => {
   clearInterval(intervalMain);
   setTimeout(() => log(state, padWithGround("GAME OVER!")), 0);
-  setTimeout(() => init(state), 2000);
-};
-var quit = () => {
-  process.exit();
+  setTimeout(() => initStartScreen(state), 2000);
 };
 var checkCollision = (state, chunks) => {
   const targetBlock = chunks[PLAYER_X];
@@ -119,7 +116,7 @@ var startGame = () => {
   }, 50);
   process.stdin.on("data", (key) => {
     if (key === "\x03")
-      quit();
+      process.exit();
     const match = keys[key];
     if (match) {
       state.playerState = match;
@@ -130,5 +127,5 @@ var startGame = () => {
     }
   });
 };
-preInit();
-setTimeout(init, 500);
+init();
+setTimeout(initStartScreen, 1000);
