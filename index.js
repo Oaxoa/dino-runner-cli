@@ -47,7 +47,7 @@ var onStartKey = (key) => {
     startGame();
   }
 };
-var getPad = (len) => new Array(len).fill("_").join("");
+var getPad = (len) => new Array(Math.max(len, 0)).fill("_").join("");
 var padWithGround = (arg) => {
   const width = Math.min(process.stdout.columns - OFFSET_UI, CHUNK_SIZE);
   const diffLength = width - arg.length;

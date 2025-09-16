@@ -79,7 +79,7 @@ const onStartKey = (key) => {
 	}
 };
 
-const getPad = (len: number) => new Array(len).fill('_').join('');
+const getPad = (len: number) => new Array(Math.max(len, 0)).fill('_').join('');
 
 const padWithGround = (arg: string) => {
 	const width = Math.min(process.stdout.columns - OFFSET_UI, CHUNK_SIZE);
